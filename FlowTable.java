@@ -8,6 +8,7 @@ class Match {
     public Match(int bitVector, int mask, int priority, Action[] actions) {
         this.bitVector = bitVector;
         this.mask = mask;
+        // TODO: what to match on? variable? packet attribute?
         this.priority = priority;
         this.actions = actions;
     }
@@ -24,11 +25,13 @@ class Match {
 }
 
 class FlowTable {
+    private static int nextIndex = 0;
     public int index;
     public Match[] matches;
 
     public FlowTable(int index, Match[] matches) {
-        this.index = index;
+        this.index = nextIndex;
+        nextIndex++;
         this.matches = matches;
     }
 

@@ -1,6 +1,9 @@
 
 abstract class Statement {
     // TODO: make methods to return inputs/outputs for dataflow
+    public FlowTable[] asFlowTables() {
+        return new FlowTable[0];
+    }
 }
 
 class IF extends Statement {
@@ -13,6 +16,10 @@ class IF extends Statement {
         thenBranch = then;
         elseBranch = elseStm;
     }
+
+    /*public FlowTable[] asFlowTables() {
+
+    }*/
 }
 
 class Assign extends Statement {
