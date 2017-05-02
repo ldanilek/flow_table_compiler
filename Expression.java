@@ -72,7 +72,8 @@ class LookUp extends Expression {
         for (Map.Entry<Integer, Integer> e : this.map.entrySet()) {
             ArrayList cells = Util.listWithObject(new Cell(e.getKey().intValue(), ~0, subResult.field));
             ArrayList actions = Util.listWithObject(new AssignVariableAction(output, e.getValue().intValue()));
-            table.rows.add(new Row(1, actions, cells));
+            Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+            table.rows.add(new Row(1, actions, cells, jumpIndex));
         }
         subResult.tables.add(table);
         return new ExpressionResult(subResult.tables, new MatchableField(output));
@@ -88,7 +89,8 @@ class Constant extends Expression {
     public ExpressionResult asFlowTables(FlowTable jumpTo) {
         String output = this.newDummyVar();
         ArrayList actions = Util.listWithObject(new AssignVariableAction(output, val));
-        ArrayList rows = Util.listWithObject(new Row(1, actions, new ArrayList()));
+        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+        ArrayList rows = Util.listWithObject(new Row(1, actions, new ArrayList(), jumpIndex));
         FlowTable table = new FlowTable(new Header(new ArrayList()), rows);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);

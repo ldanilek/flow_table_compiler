@@ -53,16 +53,6 @@ class AssignVariableToFieldAction extends Action {
     }
 }
 
-class JumpAction extends Action {
-    public int flowTableIndex;
-    public JumpAction(int idx) {
-        flowTableIndex = idx;
-    }
-    public String printable() {
-        return "jump("+Integer.toString(flowTableIndex)+")";
-    }
-}
-
 class ForwardAction extends Action {
     public String printable() {
         return "forward()";
