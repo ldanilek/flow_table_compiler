@@ -64,18 +64,16 @@ class LookUp extends Expression {
 
     @Override
     public ExpressionResult asFlowTables(FlowTable jumpTo) {
-        FlowTable table = new FlowTable(new Header(new MatchableField[0]), new Row[0]);
+        FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
         ExpressionResult subResult = this.exp.asFlowTables(table);
-        MatchableField[] matching = {subResult.field};
-        table.header = new Header(matching);
+        table.header = new Header(Util.listWithObject(subResult.field));
         String output = this.newDummyVar();
         ArrayList<Row> rows = new ArrayList<Row>();
         for (Map.Entry<Integer, Integer> e : this.map.entrySet()) {
-            Cell[] cells = {new Cell(e.getKey().intValue(), ~0, subResult.field)};
-            Action[] actions = {new AssignVariableAction(output, e.getValue().intValue())};
-            rows.add(new Row(1, actions, cells));
+            ArrayList cells = Util.listWithObject(new Cell(e.getKey().intValue(), ~0, subResult.field));
+            ArrayList actions = Util.listWithObject(new AssignVariableAction(output, e.getValue().intValue()));
+            table.rows.add(new Row(1, actions, cells));
         }
-        table.rows = (Row[])(rows.toArray());
         subResult.tables.add(table);
         return new ExpressionResult(subResult.tables, new MatchableField(output));
     }
@@ -89,9 +87,9 @@ class Constant extends Expression {
     @Override
     public ExpressionResult asFlowTables(FlowTable jumpTo) {
         String output = this.newDummyVar();
-        Action[] actions = {new AssignVariableAction(output, val)};
-        Row[] rows = {new Row(1, actions, new Cell[0])};
-        FlowTable table = new FlowTable(new Header(new MatchableField[0]), rows);
+        ArrayList actions = Util.listWithObject(new AssignVariableAction(output, val));
+        ArrayList rows = Util.listWithObject(new Row(1, actions, new ArrayList()));
+        FlowTable table = new FlowTable(new Header(new ArrayList()), rows);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);
         return new ExpressionResult(tables, new MatchableField(output));

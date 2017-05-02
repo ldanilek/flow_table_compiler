@@ -8,32 +8,23 @@ abstract class Statement {
     }
 
     // helper functions for subclasses
-    public FlowTable flowTableForActions(Action[] actions) {
+    public FlowTable flowTableForActions(ArrayList<Action> actions) {
         MatchableField dummyField = new MatchableField(PacketField.InPort);
-        MatchableField[] dummyFields = {dummyField};
-        Header header = new Header(dummyFields);
-        Cell[] matchAll = {new Cell(0, 0, dummyField)};
+        Header header = new Header(Util.listWithObject(dummyField));
+        ArrayList matchAll = Util.listWithObject(new Cell(0, 0, dummyField));
         Row row = new Row(1, actions, matchAll);
-        Row[] rows = {row};
-        return new FlowTable(header, rows);
+        return new FlowTable(header, Util.listWithObject(row));
     }
 
-    public Action[] actionsFollowedByJump(Action[] actions, FlowTable jumpTo) {
+    public void actionsFollowedByJump(ArrayList<Action> actions, FlowTable jumpTo) {
         if (jumpTo != null) {
-            int length = actions.length;
-            Action[] newActions = new Action[length+1];
-            for (int i = 0; i < length; i++) {
-                newActions[i] = actions[i];
-            }
-            newActions[length] = new JumpAction(jumpTo.index);
-            actions = newActions;
+            actions.add(new JumpAction(jumpTo.index));
         }
-        return actions;
     }
 
     public ArrayList<FlowTable> flowTablesForAction(Action action, FlowTable jumpTo) {
-        Action[] actions = {action};
-        actions = this.actionsFollowedByJump(actions, jumpTo);
+        ArrayList actions = Util.listWithObject(action);
+        this.actionsFollowedByJump(actions, jumpTo);
         FlowTable table = this.flowTableForActions(actions);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);
@@ -42,6 +33,10 @@ abstract class Statement {
 }
 
 class DecrementTTL extends Statement {
+    @Override
+    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+        return this.flowTablesForAction(new DecrementTTLAction(), jumpTo);
+    }
 }
 
 class IF extends Statement {
@@ -55,9 +50,11 @@ class IF extends Statement {
         elseBranch = elseStm;
     }
 
-    /*public FlowTable[] asFlowTables() {
-
-    }*/
+    @Override
+    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+        // TODO: conditionals
+        return null;
+    }
 }
 
 class Assign extends Statement {
@@ -71,12 +68,11 @@ class Assign extends Statement {
 
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        FlowTable table = new FlowTable(new Header(new MatchableField[0]), new Row[0]);
+        FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
         ExpressionResult expResult = value.asFlowTables(table);
-        Action[] actions = {new CopyVariableAction(variable, expResult.field)};
-        actions = this.actionsFollowedByJump(actions, jumpTo);
-        Row[] rows = {new Row(1, actions, new Cell[0])};
-        table.rows = rows;
+        ArrayList actions = Util.listWithObject(new CopyVariableAction(variable, expResult.field));
+        this.actionsFollowedByJump(actions, jumpTo);
+        table.rows.add(new Row(1, actions, new ArrayList()));
         expResult.tables.add(table);
         return expResult.tables;
     }
@@ -94,12 +90,11 @@ class AssignField extends Statement {
 
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        FlowTable table = new FlowTable(new Header(new MatchableField[0]), new Row[0]);
+        FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
         ExpressionResult expResult = value.asFlowTables(table);
-        Action[] actions = {new AssignVariableToFieldAction(field, expResult.field)};
-        actions = this.actionsFollowedByJump(actions, jumpTo);
-        Row[] rows = {new Row(1, actions, new Cell[0])};
-        table.rows = rows;
+        ArrayList actions = Util.listWithObject(new AssignVariableToFieldAction(field, expResult.field));
+        this.actionsFollowedByJump(actions, jumpTo);
+        table.rows.add(new Row(1, actions, new ArrayList()));
         expResult.tables.add(table);
         return expResult.tables;
     }

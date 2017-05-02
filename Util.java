@@ -1,3 +1,4 @@
+import java.util.*;
 
 public class Util{
     /* Regular one doesn't include leading 0's... */
@@ -16,5 +17,11 @@ public class Util{
         }
 
         return new String(bitVectorChars);
+    }
+
+    static ArrayList listWithObject(Object obj) {
+        ArrayList list = new ArrayList();
+        list.add(obj);
+        return list;
     }
 }
