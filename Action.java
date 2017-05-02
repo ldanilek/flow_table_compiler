@@ -13,7 +13,7 @@ class AssignFieldAction extends Action {
         this.value = value;
     }
     public String printable() {
-        return "assign(packet."+field.name()+", "+Integer.toString(value)+")";
+        return "packet."+field.name()+" := "+value;
     }
 }
 
@@ -25,7 +25,7 @@ class AssignVariableAction extends Action {
         value = val;
     }
     public String printable() {
-        return "assign("+variable+", "+Integer.toString(value)+")";
+        return variable+" := "+value;
     }
 }
 
@@ -37,7 +37,7 @@ class CopyVariableAction extends Action {
         value = val;
     }
     public String printable() {
-        return "assign("+variable+", "+value.printable()+")";
+        return variable+" := "+value.printable();
     }
 }
 
@@ -49,7 +49,7 @@ class AssignVariableToFieldAction extends Action {
         value = val;
     }
     public String printable() {
-        return "assign("+field.name()+", "+value.printable()+")";
+        return "packet."+field.name()+" := "+value.printable();
     }
 }
 

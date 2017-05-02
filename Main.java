@@ -9,6 +9,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        FlowTable.switchIndex = 2;
         Statement tree =
             new IF(
                 new Compare(new PacketValue(PacketField.InPort),
@@ -25,6 +26,9 @@ public class Main {
         hashMap.put(1024, 0);
         Statement hashLookup = new Assign("hashResult", new LookUp(hashMap, new PacketValue(PacketField.InPort)));
         printTablesForTree(hashLookup);
+
+        Statement switchLookup = new Assign("hashResult", new LookUp(hashMap, new Switch()));
+        printTablesForTree(switchLookup);
 
         MatchableField[] matchableFields = {
             new MatchableField(PacketField.IPv4Src),

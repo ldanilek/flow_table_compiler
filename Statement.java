@@ -8,22 +8,22 @@ abstract class Statement {
     }
 
     // helper functions for subclasses
-    public FlowTable flowTableForActions(ArrayList<Action> actions) {
+    public static FlowTable flowTableForActions(ArrayList<Action> actions) {
         Header header = new Header(new ArrayList());
         Row row = new Row(1, actions, new ArrayList());
         return new FlowTable(header, Util.listWithObject(row));
     }
 
-    public void actionsFollowedByJump(ArrayList<Action> actions, FlowTable jumpTo) {
+    public static void actionsFollowedByJump(ArrayList<Action> actions, FlowTable jumpTo) {
         if (jumpTo != null) {
             actions.add(new JumpAction(jumpTo.index));
         }
     }
 
-    public ArrayList<FlowTable> flowTablesForAction(Action action, FlowTable jumpTo) {
+    public static ArrayList<FlowTable> flowTablesForAction(Action action, FlowTable jumpTo) {
         ArrayList actions = Util.listWithObject(action);
-        this.actionsFollowedByJump(actions, jumpTo);
-        FlowTable table = this.flowTableForActions(actions);
+        Statement.actionsFollowedByJump(actions, jumpTo);
+        FlowTable table = Statement.flowTableForActions(actions);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);
         return tables;
@@ -33,7 +33,7 @@ abstract class Statement {
 class DecrementTTL extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new DecrementTTLAction(), jumpTo);
+        return Statement.flowTablesForAction(new DecrementTTLAction(), jumpTo);
     }
 }
 
@@ -69,7 +69,7 @@ class Assign extends Statement {
         FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
         ExpressionResult expResult = value.asFlowTables(table);
         ArrayList actions = Util.listWithObject(new CopyVariableAction(variable, expResult.field));
-        this.actionsFollowedByJump(actions, jumpTo);
+        Statement.actionsFollowedByJump(actions, jumpTo);
         table.rows.add(new Row(1, actions, new ArrayList()));
         expResult.tables.add(table);
         return expResult.tables;
@@ -91,7 +91,7 @@ class AssignField extends Statement {
         FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
         ExpressionResult expResult = value.asFlowTables(table);
         ArrayList actions = Util.listWithObject(new AssignVariableToFieldAction(field, expResult.field));
-        this.actionsFollowedByJump(actions, jumpTo);
+        Statement.actionsFollowedByJump(actions, jumpTo);
         table.rows.add(new Row(1, actions, new ArrayList()));
         expResult.tables.add(table);
         return expResult.tables;
@@ -101,28 +101,28 @@ class AssignField extends Statement {
 class VerifyChecksum extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new VerifyChecksumAction(), jumpTo);
+        return Statement.flowTablesForAction(new VerifyChecksumAction(), jumpTo);
     }
 }
 
 class RecomputeCheckSum extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new RecomputeChecksumAction(), jumpTo);
+        return Statement.flowTablesForAction(new RecomputeChecksumAction(), jumpTo);
     }
 }
 
 class Drop extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new DropAction(), jumpTo);
+        return Statement.flowTablesForAction(new DropAction(), jumpTo);
     }
 }
 
 class Forward extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new ForwardAction(), jumpTo);
+        return Statement.flowTablesForAction(new ForwardAction(), jumpTo);
     }
 }
 

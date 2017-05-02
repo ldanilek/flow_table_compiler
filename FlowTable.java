@@ -18,7 +18,7 @@ class Header {
     public String printable(){
         String str = "Pr:\t";
         for(int i = 0; i < fields.size(); i++){
-           str += String.format("%32s", fields.get(i).printable()); // vector field and bitmask!
+           str += String.format("%16s%16s\t", fields.get(i).printable(), ""); // vector field and bitmask!
         }
         return str += "Actions";
     }
@@ -66,6 +66,7 @@ class Row {
 }
 
 class FlowTable {
+    public static int switchIndex = 0;
     private static int nextIndex = 0;
     public int index;
     public Header header;
