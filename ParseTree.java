@@ -8,8 +8,7 @@ public class ParseTree {
                     CompareOperation.LT, 80),
                 new Drop(),
                 new Sequence(
-                    new AssignField(PacketField.TTL,
-                        new Decrement(new PacketValue(PacketField.TTL))),
+                    new DecrementTTL(),
                     new Forward()));
         Statement simpleTree = new Drop();
         Action[] actions = {new DropAction()};
