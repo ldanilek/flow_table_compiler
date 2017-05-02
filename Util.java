@@ -12,7 +12,7 @@ public class Util{
         char[] maskChars = intToBinaryString(mask).toCharArray();
 
         for(int i = 0; i < bitVectorChars.length; i++){
-          if(maskChars[i] == '1')
+          if(maskChars[i] == '0')
             bitVectorChars[i] = 'x';
         }
 

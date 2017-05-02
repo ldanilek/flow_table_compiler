@@ -9,10 +9,8 @@ abstract class Statement {
 
     // helper functions for subclasses
     public FlowTable flowTableForActions(ArrayList<Action> actions) {
-        MatchableField dummyField = new MatchableField(PacketField.InPort);
-        Header header = new Header(Util.listWithObject(dummyField));
-        ArrayList matchAll = Util.listWithObject(new Cell(0, 0, dummyField));
-        Row row = new Row(1, actions, matchAll);
+        Header header = new Header(new ArrayList());
+        Row row = new Row(1, actions, new ArrayList());
         return new FlowTable(header, Util.listWithObject(row));
     }
 
