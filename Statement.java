@@ -43,8 +43,12 @@ class IF extends Statement {
 
     @Override
     public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
-        // TODO: conditionals
-        return null;
+      if (condition.result()) {
+        return thenBranch.asFlowTables(jumpIndex);
+      }
+      else {
+        return elseBranch.asFlowTables(jumpIndex);
+      }
     }
 }
 
