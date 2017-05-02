@@ -2,7 +2,7 @@ import java.util.*;
 
 // evaluates to an integer
 abstract class Expression {
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         return null;
     }
 
@@ -32,7 +32,7 @@ class Variable extends Expression {
     }
 
     @Override
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         return new ExpressionResult(new ArrayList<FlowTable>(), new MatchableField(variable));
     }
 }
@@ -44,7 +44,7 @@ class PacketValue extends Expression {
     }
 
     @Override
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         return new ExpressionResult(new ArrayList<FlowTable>(), new MatchableField(field));
     }
 }
@@ -53,10 +53,10 @@ class PacketValue extends Expression {
 // being compiled for.
 class Switch extends Expression {
     @Override
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         String output = "switch";
         Action action = new AssignVariableAction(output, FlowTable.switchIndex);
-        ArrayList<FlowTable> tables = Statement.flowTablesForAction(action, jumpTo);
+        ArrayList<FlowTable> tables = Statement.flowTablesForAction(action, jumpIndex);
         return new ExpressionResult(tables, new MatchableField(output));
     }
 }
@@ -70,16 +70,15 @@ class LookUp extends Expression {
     }
 
     @Override
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
-        ExpressionResult subResult = this.exp.asFlowTables(table);
+        ExpressionResult subResult = this.exp.asFlowTables(table.index);
         table.header = new Header(Util.listWithObject(subResult.field));
         String output = this.newDummyVar();
         ArrayList<Row> rows = new ArrayList<Row>();
         for (Map.Entry<Integer, Integer> e : this.map.entrySet()) {
             ArrayList cells = Util.listWithObject(new Cell(e.getKey().intValue(), ~0, subResult.field));
             ArrayList actions = Util.listWithObject(new AssignVariableAction(output, e.getValue().intValue()));
-            Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
             table.rows.add(new Row(1, actions, cells, jumpIndex));
         }
         subResult.tables.add(table);
@@ -93,10 +92,10 @@ class Constant extends Expression {
         this.val = val;
     }
     @Override
-    public ExpressionResult asFlowTables(FlowTable jumpTo) {
+    public ExpressionResult asFlowTables(Integer jumpIndex) {
         String output = this.newDummyVar();
         Action action = new AssignVariableAction(output, val);
-        ArrayList<FlowTable> tables = Statement.flowTablesForAction(action, jumpTo);
+        ArrayList<FlowTable> tables = Statement.flowTablesForAction(action, jumpIndex);
         return new ExpressionResult(tables, new MatchableField(output));
     }
 }

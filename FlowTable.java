@@ -73,12 +73,12 @@ class Row {
 class FlowTable {
     public static int switchIndex = 0;
     private static int nextIndex = 0;
-    public int index;
+    public Integer index;
     public Header header;
     public ArrayList<Row> rows;
 
     public FlowTable(Header header, ArrayList<Row> rows) {
-        this.index = nextIndex;
+        this.index = new Integer(nextIndex);
         nextIndex++;
         this.header = header;
         this.rows = rows;

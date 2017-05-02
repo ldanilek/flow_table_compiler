@@ -2,7 +2,7 @@ import java.util.*;
 
 abstract class Statement {
     // TODO: make methods to return inputs/outputs for dataflow
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
         // first is the entry flow table
         return new ArrayList<FlowTable>();
     }
@@ -14,9 +14,8 @@ abstract class Statement {
         return new FlowTable(header, Util.listWithObject(row));
     }
 
-    public static ArrayList<FlowTable> flowTablesForAction(Action action, FlowTable jumpTo) {
+    public static ArrayList<FlowTable> flowTablesForAction(Action action, Integer jumpIndex) {
         ArrayList actions = Util.listWithObject(action);
-        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
         FlowTable table = Statement.flowTableForActions(actions, jumpIndex);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);
@@ -26,8 +25,8 @@ abstract class Statement {
 
 class DecrementTTL extends Statement {
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return Statement.flowTablesForAction(new DecrementTTLAction(), jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        return Statement.flowTablesForAction(new DecrementTTLAction(), jumpIndex);
     }
 }
 
@@ -43,7 +42,7 @@ class IF extends Statement {
     }
 
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
         // TODO: conditionals
         return null;
     }
@@ -59,11 +58,10 @@ class Assign extends Statement {
     }
 
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
         FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
-        ExpressionResult expResult = value.asFlowTables(table);
+        ExpressionResult expResult = value.asFlowTables(table.index);
         ArrayList actions = Util.listWithObject(new CopyVariableAction(variable, expResult.field));
-        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
         table.rows.add(new Row(1, actions, new ArrayList(), jumpIndex));
         expResult.tables.add(table);
         return expResult.tables;
@@ -81,11 +79,10 @@ class AssignField extends Statement {
     }
 
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
         FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
-        ExpressionResult expResult = value.asFlowTables(table);
+        ExpressionResult expResult = value.asFlowTables(table.index);
         ArrayList actions = Util.listWithObject(new AssignVariableToFieldAction(field, expResult.field));
-        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
         table.rows.add(new Row(1, actions, new ArrayList(), jumpIndex));
         expResult.tables.add(table);
         return expResult.tables;
@@ -94,29 +91,29 @@ class AssignField extends Statement {
 
 class VerifyChecksum extends Statement {
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return Statement.flowTablesForAction(new VerifyChecksumAction(), jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        return Statement.flowTablesForAction(new VerifyChecksumAction(), jumpIndex);
     }
 }
 
 class RecomputeCheckSum extends Statement {
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return Statement.flowTablesForAction(new RecomputeChecksumAction(), jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        return Statement.flowTablesForAction(new RecomputeChecksumAction(), jumpIndex);
     }
 }
 
 class Drop extends Statement {
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return Statement.flowTablesForAction(new DropAction(), jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        return Statement.flowTablesForAction(new DropAction(), jumpIndex);
     }
 }
 
 class Forward extends Statement {
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return Statement.flowTablesForAction(new ForwardAction(), jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        return Statement.flowTablesForAction(new ForwardAction(), jumpIndex);
     }
 }
 
@@ -130,11 +127,11 @@ class Sequence extends Statement {
     }
 
     @Override
-    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        ArrayList<FlowTable> tables2 = stm2.asFlowTables(jumpTo);
+    public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
+        ArrayList<FlowTable> tables2 = stm2.asFlowTables(jumpIndex);
         // note a statement must be turned into at least one flow table.
         FlowTable table2 = tables2.get(0);
-        ArrayList<FlowTable> tables1 = stm1.asFlowTables(table2);
+        ArrayList<FlowTable> tables1 = stm1.asFlowTables(table2.index);
         tables1.addAll(tables2);
         return tables1;
     }
