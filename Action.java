@@ -51,6 +51,12 @@ class DropAction extends Action {
     }
 }
 
+class DecrementTTLAction extends Action {
+    public String printable() {
+        return "packet.ttl--";
+    }
+}
+
 class VerifyChecksumAction extends Action {
     public String printable() {
         return "verifyChecksum()";

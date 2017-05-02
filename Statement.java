@@ -6,6 +6,9 @@ abstract class Statement {
     }
 }
 
+class DecrementTTL extends Statement {
+}
+
 class IF extends Statement {
     public Conditional condition;
     public Statement thenBranch;

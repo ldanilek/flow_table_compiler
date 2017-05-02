@@ -33,13 +33,6 @@ class LookUp extends Expression {
     }
 }
 
-class Decrement extends Expression {
-    public Expression exp;
-    public Decrement(Expression exp) {
-        this.exp = exp;
-    }
-}
-
 class Constant extends Expression {
     public int val;
     public Constant(int val) {
