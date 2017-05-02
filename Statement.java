@@ -3,6 +3,7 @@ import java.util.*;
 abstract class Statement {
     // TODO: make methods to return inputs/outputs for dataflow
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+        // first is the entry flow table
         return new ArrayList<FlowTable>();
     }
 
@@ -20,8 +21,12 @@ abstract class Statement {
     public Action[] actionsFollowedByJump(Action[] actions, FlowTable jumpTo) {
         if (jumpTo != null) {
             int length = actions.length;
-            actions = new Action[length+1];
-            actions[length] = new JumpAction(jumpTo.index);
+            Action[] newActions = new Action[length+1];
+            for (int i = 0; i < length; i++) {
+                newActions[i] = actions[i];
+            }
+            newActions[length] = new JumpAction(jumpTo.index);
+            actions = newActions;
         }
         return actions;
     }
@@ -63,6 +68,18 @@ class Assign extends Statement {
         variable = var;
         value = val;
     }
+
+    @Override
+    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+        FlowTable table = new FlowTable(new Header(new MatchableField[0]), new Row[0]);
+        ExpressionResult expResult = value.asFlowTables(table);
+        Action[] actions = {new CopyVariableAction(variable, expResult.field)};
+        actions = this.actionsFollowedByJump(actions, jumpTo);
+        Row[] rows = {new Row(1, actions, new Cell[0])};
+        table.rows = rows;
+        expResult.tables.add(table);
+        return expResult.tables;
+    }
 }
 
 // changes a field of the packet
@@ -77,7 +94,14 @@ class AssignField extends Statement {
 
     @Override
     public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
-        return this.flowTablesForAction(new RecomputeChecksumAction(), jumpTo);
+        FlowTable table = new FlowTable(new Header(new MatchableField[0]), new Row[0]);
+        ExpressionResult expResult = value.asFlowTables(table);
+        Action[] actions = {new AssignVariableToFieldAction(field, expResult.field)};
+        actions = this.actionsFollowedByJump(actions, jumpTo);
+        Row[] rows = {new Row(1, actions, new Cell[0])};
+        table.rows = rows;
+        expResult.tables.add(table);
+        return expResult.tables;
     }
 }
 
@@ -116,5 +140,15 @@ class Sequence extends Statement {
     public Sequence(Statement first, Statement second) {
         stm1 = first;
         stm2 = second;
+    }
+
+    @Override
+    public ArrayList<FlowTable> asFlowTables(FlowTable jumpTo) {
+        ArrayList<FlowTable> tables2 = stm2.asFlowTables(jumpTo);
+        // note a statement must be turned into at least one flow table.
+        FlowTable table2 = tables2.get(0);
+        ArrayList<FlowTable> tables1 = stm1.asFlowTables(table2);
+        tables1.addAll(tables2);
+        return tables1;
     }
 }

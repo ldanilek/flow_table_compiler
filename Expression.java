@@ -76,9 +76,8 @@ class LookUp extends Expression {
             rows.add(new Row(1, actions, cells));
         }
         table.rows = (Row[])(rows.toArray());
-        ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
-        tables.add(table);
-        return new ExpressionResult(tables, new MatchableField(output));
+        subResult.tables.add(table);
+        return new ExpressionResult(subResult.tables, new MatchableField(output));
     }
 }
 
