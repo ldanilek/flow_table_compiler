@@ -8,22 +8,16 @@ abstract class Statement {
     }
 
     // helper functions for subclasses
-    public static FlowTable flowTableForActions(ArrayList<Action> actions) {
+    public static FlowTable flowTableForActions(ArrayList<Action> actions, Integer jumpIndex) {
         Header header = new Header(new ArrayList());
-        Row row = new Row(1, actions, new ArrayList());
+        Row row = new Row(1, actions, new ArrayList(), jumpIndex);
         return new FlowTable(header, Util.listWithObject(row));
-    }
-
-    public static void actionsFollowedByJump(ArrayList<Action> actions, FlowTable jumpTo) {
-        if (jumpTo != null) {
-            actions.add(new JumpAction(jumpTo.index));
-        }
     }
 
     public static ArrayList<FlowTable> flowTablesForAction(Action action, FlowTable jumpTo) {
         ArrayList actions = Util.listWithObject(action);
-        Statement.actionsFollowedByJump(actions, jumpTo);
-        FlowTable table = Statement.flowTableForActions(actions);
+        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+        FlowTable table = Statement.flowTableForActions(actions, jumpIndex);
         ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
         tables.add(table);
         return tables;
@@ -69,8 +63,8 @@ class Assign extends Statement {
         FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
         ExpressionResult expResult = value.asFlowTables(table);
         ArrayList actions = Util.listWithObject(new CopyVariableAction(variable, expResult.field));
-        Statement.actionsFollowedByJump(actions, jumpTo);
-        table.rows.add(new Row(1, actions, new ArrayList()));
+        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+        table.rows.add(new Row(1, actions, new ArrayList(), jumpIndex));
         expResult.tables.add(table);
         return expResult.tables;
     }
@@ -91,8 +85,8 @@ class AssignField extends Statement {
         FlowTable table = new FlowTable(new Header(new ArrayList()), new ArrayList());
         ExpressionResult expResult = value.asFlowTables(table);
         ArrayList actions = Util.listWithObject(new AssignVariableToFieldAction(field, expResult.field));
-        Statement.actionsFollowedByJump(actions, jumpTo);
-        table.rows.add(new Row(1, actions, new ArrayList()));
+        Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+        table.rows.add(new Row(1, actions, new ArrayList(), jumpIndex));
         expResult.tables.add(table);
         return expResult.tables;
     }

@@ -1,4 +1,4 @@
-/* Written by Tyler/Lee
+/* Written by Tyler/Lee/Emon
  *
  * Note - may need to change some of these classes to public to make them
  * accessible outside this file!
@@ -44,11 +44,13 @@ class Row {
     public int priority;
     public ArrayList<Action> actions;
     public ArrayList<Cell> cells;
+    public Integer jumpIndex;
 
-    public Row(int priority, ArrayList<Action> actions, ArrayList<Cell> cells) {
+    public Row(int priority, ArrayList<Action> actions, ArrayList<Cell> cells, Integer jumpIndex) {
         this.priority = priority;
         this.actions = actions;
         this.cells = cells;
+        this.jumpIndex = jumpIndex;
     }
 
     public String printable() {
@@ -61,6 +63,9 @@ class Row {
         for (int i = 0; i < actions.size(); i++) {
             str += actions.get(i).printable() + "; ";
         }
+        // Print jump to FlowTable as action (if applicable).
+        if (jumpIndex != null)
+            str += "jump(" + jumpIndex.toString() + "); ";
         return str + "}";
     }
 }

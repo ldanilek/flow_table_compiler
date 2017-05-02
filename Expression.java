@@ -79,8 +79,8 @@ class LookUp extends Expression {
         for (Map.Entry<Integer, Integer> e : this.map.entrySet()) {
             ArrayList cells = Util.listWithObject(new Cell(e.getKey().intValue(), ~0, subResult.field));
             ArrayList actions = Util.listWithObject(new AssignVariableAction(output, e.getValue().intValue()));
-            Statement.actionsFollowedByJump(actions, jumpTo);
-            table.rows.add(new Row(1, actions, cells));
+            Integer jumpIndex = (jumpTo != null) ? jumpTo.index : null;
+            table.rows.add(new Row(1, actions, cells, jumpIndex));
         }
         subResult.tables.add(table);
         return new ExpressionResult(subResult.tables, new MatchableField(output));

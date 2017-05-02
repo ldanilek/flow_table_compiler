@@ -42,9 +42,9 @@ public class Main {
           new Cell(392, 100, new MatchableField(PacketField.InPort))
         };
         Row[] rows = {
-            new Row(0, new ArrayList<Action>(Arrays.asList(actionsA)), new ArrayList<Cell>(Arrays.asList(cells))),
-            new Row(1, new ArrayList<Action>(Arrays.asList(actionsB)), new ArrayList<Cell>(Arrays.asList(cells))),
-            new Row(2, new ArrayList<Action>(Arrays.asList(actionsC)), new ArrayList<Cell>(Arrays.asList(cells)))
+            new Row(0, new ArrayList<Action>(Arrays.asList(actionsA)), new ArrayList<Cell>(Arrays.asList(cells)), null),
+            new Row(1, new ArrayList<Action>(Arrays.asList(actionsB)), new ArrayList<Cell>(Arrays.asList(cells)), null),
+            new Row(2, new ArrayList<Action>(Arrays.asList(actionsC)), new ArrayList<Cell>(Arrays.asList(cells)), null)
         };
         FlowTable table = new FlowTable(header, new ArrayList<Row>(Arrays.asList(rows)));
         System.out.println(table.printable());
