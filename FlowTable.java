@@ -83,6 +83,12 @@ class FlowTable {
         this.header = header;
         this.rows = rows;
     }
+    
+    public FlowTable(Header header, ArrayList<Row> rows, int index) {
+        this.index = index;
+        this.header = header;
+        this.rows = rows;
+    }
 
     public String printable() {
         String str = "Flow Table "+Integer.toString(index)+"\n";
