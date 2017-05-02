@@ -1,7 +1,8 @@
+import java.util.*;
 
 abstract class Statement {
     // TODO: make methods to return inputs/outputs for dataflow
-    public FlowTable[] asFlowTables() {
+    public ArrayList<FlowTable> asFlowTables() {
         return new FlowTable[0];
     }
 }
@@ -50,7 +51,14 @@ class ValidateCheckSum extends Statement {}
 
 class RecomputeCheckSum extends Statement {}
 
-class Drop extends Statement {}
+class Drop extends Statement {
+    public ArrayList<FlowTable> asFlowTables() {
+        FlowTable table = new FlowTable();
+        ArrayList<FlowTable> tables = new ArrayList<FlowTable>();
+        tables.add(table);
+        return tables;
+    }
+}
 
 class Forward extends Statement {}
 
