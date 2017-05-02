@@ -4,21 +4,23 @@
  * accessible outside this file!
  */
 
+import java.util.ArrayList;
+
 /* The header row for a flow table, specifying column vals */
 class Header {
-    public MatchableField[] fields;
+    public ArrayList<MatchableField> fields;
 
-    public Header(MatchableField[] fields){
+    public Header(ArrayList<MatchableField> fields){
         this.fields = fields;
     }
 
+    // Make it look nice when it goes before rows!
     public String printable(){
-        String str = "Header Fields:\t";
-        for(int i = 0; i < fields.length; i++){
-           str += fields[i].printable();
+        String str = "Pr:\t";
+        for(int i = 0; i < fields.size(); i++){
+           str += String.format("%32s", fields.get(i).printable()); // vector field and bitmask!
         }
-
-        return str;
+        return str += "Actions";
     }
 }
 
@@ -40,10 +42,10 @@ class Cell{
  * just default to wildcard (i.e. don't match on that field) */
 class Row {
     public int priority;
-    public Action[] actions;
-    public Cell[] cells;
+    public ArrayList<Action> actions;
+    public ArrayList<Cell> cells;
 
-    public Row(int priority, Action[] actions, Cell[] cells) {
+    public Row(int priority, ArrayList<Action> actions, ArrayList<Cell> cells) {
         this.priority = priority;
         this.actions = actions;
         this.cells = cells;
@@ -51,13 +53,13 @@ class Row {
 
     public String printable() {
         String str = Integer.toString(priority) + "\t";
-        for(int i = 0; i < cells.length; i++){
-           str += Integer.toBinaryString(cells[i].bitVector) + "\t"
-            + Integer.toBinaryString(cells[i].mask) + "\t";
+        for(int i = 0; i < cells.size(); i++){
+           str += Util.prettyBinaryMatch(cells.get(i).bitVector, cells.get(i).mask) + "\t";
+
         }
         str += "{";
-        for (int i = 0; i < actions.length; i++) {
-            str += actions[i].printable() + "; ";
+        for (int i = 0; i < actions.size(); i++) {
+            str += actions.get(i).printable() + "; ";
         }
         return str + "}";
     }
@@ -67,9 +69,9 @@ class FlowTable {
     private static int nextIndex = 0;
     public int index;
     public Header header;
-    public Row[] rows;
+    public ArrayList<Row> rows;
 
-    public FlowTable(Header header, Row[] rows) {
+    public FlowTable(Header header, ArrayList<Row> rows) {
         this.index = nextIndex;
         nextIndex++;
         this.header = header;
@@ -79,8 +81,8 @@ class FlowTable {
     public String printable() {
         String str = "Flow Table "+Integer.toString(index)+"\n";
         str += header.printable() + "\n";
-        for (int i = 0; i < rows.length; i++) {
-            str += rows[i].printable() + "\n";
+        for (int i = 0; i < rows.size(); i++) {
+            str += rows.get(i).printable() + "\n";
         }
         return str;
     }
