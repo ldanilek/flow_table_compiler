@@ -1,5 +1,5 @@
 run: all
-	java ParseTree
+	java Main
 
 all:
 	javac *.java
