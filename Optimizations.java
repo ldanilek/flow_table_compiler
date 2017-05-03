@@ -28,18 +28,11 @@ class OptimizableFlowTables {
         // Save all seen table indices and the number of tables. 
         // Determine the indexes of the children (tables jumped to) from each FlowTable. 
         for (FlowTable ft : fts) {
-            ArrayList<Integer> children = this.getFlowTableChildren(ft);
-            ArrayList<Integer> parents = new ArrayList<Integer> ();
             indexes.add(ft.index);
-            flowTables.put(ft.index, new OptFlowTable(ft, children, parents));
+            flowTables.put(ft.index, new OptFlowTable(ft, null, null));
         }
 
-        // Add parents for each FlowTable
-        for (OptFlowTable oft : flowTables.values()) {
-            for (int c : oft.children) {
-                flowTables.get(c).parents.add(new Integer(oft.index));
-            }
-        }
+        this.computeParentsAndChildren();
     }
 
     // Helper function to return an ArrayList<Integer> of the table indices of
@@ -51,8 +44,22 @@ class OptimizableFlowTables {
                 children.add(r.jumpIndex);
         }
         return children;
-    } 
+    }
 
+    // after changing jump instructions or adding/removing a table,
+    // call this to recompute the parent and child pointers
+    public void computeParentsAndChildren() {
+        for (OptFlowTable oft : flowTables.values()) {
+            oft.children = this.getFlowTableChildren(oft);
+            oft.parents = new ArrayList();
+        }
+        // Add parents for each FlowTable
+        for (OptFlowTable oft : flowTables.values()) {
+            for (int c : oft.children) {
+                flowTables.get(c).parents.add(new Integer(oft.index));
+            }
+        }
+    }
 }
 
 public class Optimizations implements PlugInOptimization {
@@ -67,21 +74,22 @@ public class Optimizations implements PlugInOptimization {
         // For each parent flowtable, find the rows that jump to the child
         // and append all of the child's actions. 
         ArrayList<Action> childActions = child.rows.get(0).actions;
+        Integer childJump = child.rows.get(0).jumpIndex;
         for (int parentInd : child.parents) {
             optimized = true;
             OptFlowTable parent = ofts.flowTables.get(parentInd);
             for (Row r : parent.rows) {
                 if (r.jumpIndex != null && r.jumpIndex.equals(childInd)) {
                     r.actions.addAll(childActions);
-                    r.jumpIndex = null;
+                    r.jumpIndex = childJump;
                 }
             }
-            parent.children.remove(new Integer(childInd));
         }
         if (optimized) {
             ofts.flowTables.remove(childInd);
             ofts.indexes.remove(new Integer(childInd));
         }
+        ofts.computeParentsAndChildren();
         return optimized;
     }
 

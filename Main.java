@@ -68,12 +68,14 @@ public class Main {
         HashMap<PacketField, Integer> packet = new HashMap();
         packet.put(PacketField.InPort, 80);
         
+        System.out.println("\nIF TEST:");
         Statement tree =
             new IF(
                 new Compare(new PacketValue(PacketField.InPort),
                     CompareOperation.EQ, 80),
                 new Drop(),
                 new Sequence(new DecrementTTL(), new Forward()));
+        runTreeOnPacket(tree, packet, optimizations);
 
         System.out.println("\nSIMPLE TREE TEST:");
         Statement simpleTree = new Drop();
