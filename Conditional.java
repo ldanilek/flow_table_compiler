@@ -1,3 +1,4 @@
+import java.util.*;
 
 // evaluates to a boolean
 abstract class Conditional {
@@ -13,12 +14,12 @@ class ConditionalResult {
     public ArrayList<FlowTable> tables;
     // where is the thing now?
     public MatchableField field;
-    public ExpressionResult(ArrayList<FlowTable> tables, MatchableField field) {
+    public ConditionalResult(ArrayList<FlowTable> tables, MatchableField field) {
         this.tables = tables;
         this.field = field;
     }
 }
-
+/*
 enum CompareOperation {
     LT, GT, LE, GE, EQ, NEQ
 }
@@ -123,4 +124,4 @@ class Not extends Conditional {
     public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
       return cond.asFlowTables(elseJumpIndex,thenJumpIndex);
     }
-}
+}*/

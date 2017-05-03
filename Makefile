@@ -1,5 +1,5 @@
 run: all
-	java Main
+	java Main Optimizations
 
 all:
 	javac *.java
