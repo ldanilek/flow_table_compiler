@@ -1,4 +1,4 @@
-// Written by Emon
+// Written by Emon/Lee
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,7 +7,6 @@ import java.util.HashMap;
 class OptFlowTable extends FlowTable {
     public HashSet<Integer> children;
     public HashSet<Integer> parents;
-    // List of Assigned Variables? Other useful information? 
 
     public OptFlowTable(FlowTable ft, HashSet<Integer> children, HashSet<Integer> parents) {
         super(ft.header, ft.rows, ft.index); 
@@ -128,7 +127,7 @@ public class Optimizations implements PlugInOptimization {
                     continue;
 
                 parentToChildRows.add(r);
-                this.saveAssignedFields(rowAssignFields, r.actions); 
+                saveAssignedFields(rowAssignFields, r.actions); 
  
                 // Save assigned fields that have been assigned in every row jumping to child. 
                 if (!seenChildJumpRow) {
@@ -139,7 +138,7 @@ public class Optimizations implements PlugInOptimization {
                 rowAssignFields.clear(); 
             }
             
-            // Don't merge child into parent if the parent doesn't assign all the children's match fields.
+            // Don't merge child into parent if the parent doesn't assign all child's match fields.
             if (!parentToChildAssignFields.containsAll(child.header.fields)) {
                 allParentsMerged = false;
                 continue;
@@ -161,24 +160,6 @@ public class Optimizations implements PlugInOptimization {
         return optimized;
     }
 
-    // Given child, merge its actions into the relevant parent rows. 
-    private void doAssignmentMerge(OptFlowTable child, ArrayList<Row> parentToChildRows, ArrayList<MatchableField> assignedFields) {
-        // TODO: Is it a problem to sort rows in place? Do we need the order for anything else? 
-        // Sort child rows in descending order of priority (highest priority first).
-        child.rows.sort(Comparator.comparingInt((Row r)->r.priority).reversed());
-        for (Row r : parentToChildRows) {
-            ArrayList<Action> assignActions = this.retrieveAssignActions(r.actions, assignedFields);
-            for (Row crow : child.rows) {
-                if (this.assignmentsMatchRow(assignActions, crow)) {
-                    r.actions.addAll(crow.actions);
-                    r.jumpIndex = crow.jumpIndex;
-                    break;
-                }
-            }
-            assignActions.clear(); 
-        }
-    }
-    
     public boolean optimize(OptimizableFlowTables ofts) {
         for (int i : ofts.indexes) {
             if (this.mergeAction(ofts, i)) {
@@ -226,6 +207,25 @@ public class Optimizations implements PlugInOptimization {
         return assignActions; 
     }
 
+    // Given child flowtable, merge its actions into the relevant parent rows for which its 
+    // assignments result in a match for. 
+    private void doAssignmentMerge(OptFlowTable child, ArrayList<Row> parentToChildRows, ArrayList<MatchableField> assignedFields) {
+        // TODO: Is it a problem to sort rows in place? Do we need the order for anything else? 
+        // Sort child rows in descending order of priority (highest priority first).
+        child.rows.sort(Comparator.comparingInt((Row r)->r.priority).reversed());
+        for (Row r : parentToChildRows) {
+            ArrayList<Action> assignActions = retrieveAssignActions(r.actions, assignedFields);
+            for (Row crow : child.rows) {
+                if (assignmentsMatchRow(assignActions, crow)) {
+                    r.actions.addAll(crow.actions);
+                    r.jumpIndex = crow.jumpIndex;
+                    break;
+                }
+            }
+            assignActions.clear(); 
+        }
+    }
+    
     // Helper: Return true if the variable/field assignments match with the row match properties. 
     private boolean assignmentsMatchRow(ArrayList<Action> assignActions, Row r) {
         boolean isMatch = true;        
