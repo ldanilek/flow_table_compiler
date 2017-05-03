@@ -46,7 +46,7 @@ class Compare extends Conditional {
           //implement less than
           break;
         case GE:
-          right = right-2;
+          right = right-1;
         case GT:
           //implement greater than
           break;
