@@ -45,16 +45,19 @@ class Compare extends Conditional {
 
       FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
       ExpressionResult resolveExp = left.asFlowTables(table.index);
-
+      table.header.add(resolveExp.field);
 
       switch (op) {
-        case LT: return (value > right);
-        case GT: return (value > right);
-        case LE: return (value <= right);
-        case GE: return (value >= right);
+        case LT:
+        case GT:
+        case LE:
+        case GE:
+        case NEQ:
         case EQ:
-
-        case NEQ: return (value != right);
+          Cell caseTrue = new Cell(resolveExp.field, right, ~0);
+          Cell caseFalse = new Cell(resolveExp.field, right, 0);
+          table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(caseTrue), thenjumpIndex));
+          table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(caseFalse), elsejumpIndex));
       }
 
       resolveExp.tables.add(table);
@@ -75,14 +78,18 @@ class Contains extends Conditional {
     @Override
     public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
-      public MatchableField valueField = value.asFlowTables(null).field;
+      FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
+      ExpressionResult resolveExp = value.asFlowTables(table.index);
 
-      for (final int i : set) {
-          if (i == valueField) {
-              return true;
-          }
-      }
-      return false;
+      // for (final int i : set) {
+      //     if (i == valueField) {
+      //         return true;
+      //     }
+      // }
+      // return false;
+
+      resolveExp.tables.add(table);
+      return resolveExp.tables;
 
     }
 
@@ -101,14 +108,9 @@ class Logic extends Conditional {
 
     @Override
     public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
-      public Boolean valueLeft = left.result();
-      public Boolean valueRight = right.result();
+      FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
 
-      switch (op) {
-        case AND: return (valueLeft & valueRight);
-        case OR: return (valueLeft | valueRight);
-        case XOR: return (valueLeft ^ valueRight);
-      }
+      return table;
     }
 
 }
