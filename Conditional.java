@@ -2,11 +2,21 @@
 // evaluates to a boolean
 abstract class Conditional {
 
-  public Boolean result() {
-    // condition false by default?
-    return false;
+  public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+    return null;
   }
 
+}
+
+class ConditionalResult {
+    // to compute the thing
+    public ArrayList<FlowTable> tables;
+    // where is the thing now?
+    public MatchableField field;
+    public ExpressionResult(ArrayList<FlowTable> tables, MatchableField field) {
+        this.tables = tables;
+        this.field = field;
+    }
 }
 
 enum CompareOperation {
@@ -31,19 +41,25 @@ class Compare extends Conditional {
     }
 
     @Override
-    public Boolean result() {
-      public MatchableField value = left.asFlowTables(null).field;
+    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+
+      FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
+      ExpressionResult resolveExp = left.asFlowTables(table.index);
+
 
       switch (op) {
         case LT: return (value > right);
         case GT: return (value > right);
         case LE: return (value <= right);
         case GE: return (value >= right);
-        case EQ: return (value == right);
+        case EQ:
+
         case NEQ: return (value != right);
       }
-    }
 
+      resolveExp.tables.add(table);
+      return resolveExp.tables;
+    }
 }
 
 class Contains extends Conditional {
@@ -57,7 +73,7 @@ class Contains extends Conditional {
     }
 
     @Override
-    public Boolean result() {
+    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
       public MatchableField valueField = value.asFlowTables(null).field;
 
@@ -84,7 +100,7 @@ class Logic extends Conditional {
     }
 
     @Override
-    public Boolean result() {
+    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
       public Boolean valueLeft = left.result();
       public Boolean valueRight = right.result();
 
@@ -104,7 +120,7 @@ class Not extends Conditional {
     }
 
     @Override
-    public Boolean result() {
-      return !(cond.result());
+    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+      return cond.asFlowTables(elseJumpIndex,thenJumpIndex);
     }
 }
