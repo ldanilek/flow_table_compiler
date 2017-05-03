@@ -38,17 +38,26 @@ class Compare extends Conditional {
       table.header.fields.add(resolveExp.field);
       Cell caseTrue;
       Cell caseFalse;
+      List<Integer> maskArray;
 
       switch (op) {
         case LE:
           right = right+1;
         case LT:
-          //implement less than
+          maskArray = Util.genMasks(right, 1);
+          for (int i : maskArray) {
+            table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(new Cell(0, i, resolveExp.field)), thenJumpIndex));
+          }
+          table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(new Cell(0, 0, resolveExp.field)), elseJumpIndex));
           break;
         case GE:
           right = right-1;
         case GT:
-          //implement greater than
+          maskArray = Util.genMasks(right, 0);
+          for (int i : maskArray) {
+            table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(new Cell(~0, i, resolveExp.field)), thenJumpIndex));
+          }
+          table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(new Cell(0, 0, resolveExp.field)), elseJumpIndex));
           break;
         case NEQ:
           caseTrue = new Cell(right, ~0, resolveExp.field);

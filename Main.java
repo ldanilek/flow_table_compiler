@@ -66,18 +66,18 @@ public class Main {
         ArrayList<PlugInOptimization> optimizations = plugInOptimizations(args);
 
         HashMap<PacketField, Integer> packet = new HashMap();
-        packet.put(PacketField.InPort, 81);
+        packet.put(PacketField.InPort, 20);
 
         System.out.println("\nIF TEST:");
         Statement tree =
             new IF(
                 new Logic(LogicOperation.AND,
-                          new Compare(CompareOperation.EQ,
+                          new Compare(CompareOperation.GE,
                                       new PacketValue(PacketField.InPort),
-                                                      80),
-                          new Compare(CompareOperation.NEQ,
+                                                      21),
+                          new Compare(CompareOperation.GE,
                                       new PacketValue(PacketField.InPort),
-                                                      80)),
+                                                      21)),
                 new Drop(),
                 new Sequence(new DecrementTTL(), new Forward()));
         runTreeOnPacket(tree, packet, optimizations);

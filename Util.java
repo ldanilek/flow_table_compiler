@@ -7,6 +7,36 @@ public class Util{
           .replace(' ', '0');
     }
 
+    static List<Integer> genMasks(int key, int flag) {
+        char[] initVector = intToBinaryString(key).toCharArray();
+        System.out.println(initVector);
+        System.out.println(initVector.length);
+        List<Integer> maskArray = new ArrayList<Integer>();
+        char check = '0';
+        char change = '1';
+
+        if (flag == 1) {
+          check = '1';
+          change = '0';
+        }
+
+        for (int i = 1, j = 0; i < initVector.length; i++) {
+          if (initVector[i] == check) {
+            char[] mask = new char[31];
+            Arrays.fill(mask, check);
+            System.arraycopy(initVector, 1, mask, 0, i-1);
+            mask[i-1] = change;
+            String maskString = new String(mask);
+            int n = Integer.parseInt(maskString, 2);
+            if (flag == 1) {
+              n = ~n;
+            }
+            maskArray.add(n);
+          }
+        }
+        return maskArray;
+    }
+
     static String prettyBinaryMatch(int bitVector, int mask){
         char[] bitVectorChars = intToBinaryString(bitVector).toCharArray();
         char[] maskChars = intToBinaryString(mask).toCharArray();
