@@ -24,4 +24,8 @@ public class Util{
         list.add(obj);
         return list;
     }
+
+    static boolean evaluateMatch(int value, int bitVector, int mask) {
+        return (value & mask) == (bitVector & mask);
+    }
 }

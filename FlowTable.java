@@ -35,6 +35,10 @@ class Cell{
         this.bitVector = bitVector;
         this.mask = mask;
     }
+
+    public boolean matchesEnv(ExecEnv env) {
+        return Util.evaluateMatch(env.matchableValue(field), bitVector, mask);
+    }
 }
 
 /* An individual row of a flowtable - fields of cells must match those in
@@ -68,6 +72,30 @@ class Row {
             str += "jump(" + jumpIndex.toString() + "); ";
         return str + "}";
     }
+
+    public boolean matchesEnv(ExecEnv env) {
+        for (Cell cell : cells) {
+            if (!cell.matchesEnv(env)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void execInEnv(ExecEnv env, ArrayList<FlowTable> tables) {
+        for (Action action : actions) {
+            action.execInEnv(env);
+        }
+        if (jumpIndex != null) {
+            for (FlowTable table : tables) {
+                if (table.index.intValue() == jumpIndex.intValue()) {
+                    table.execInEnv(env, tables);
+                    return;
+                }
+            }
+            env.outputs.add("ERROR: NO FLOW TABLE WITH INDEX "+jumpIndex);
+        }
+    }
 }
 
 class FlowTable {
@@ -97,5 +125,24 @@ class FlowTable {
             str += rows.get(i).printable() + "\n";
         }
         return str;
+    }
+
+    public void execInEnv(ExecEnv env, ArrayList<FlowTable> tables) {
+        Row bestRow = null;
+        // NOTE this means regular priorities must be nonnegative
+        int highestPriority = -1;
+        // NOTE if two matches with the same priority, we go with the earlier one
+        for (Row row : rows) {
+            if (row.priority > highestPriority && row.matchesEnv(env)) {
+                bestRow = row;
+                highestPriority = row.priority;
+            }
+        }
+
+        if (bestRow == null) {
+            env.outputs.add("ERROR: NO ROW MATCH IN FLOWTABLE "+index);
+        } else {
+            bestRow.execInEnv(env, tables);
+        }
     }
 }

@@ -3,6 +3,9 @@ abstract class Action { // lawsuit
     public String printable() {
         return "undefined-action";
     }
+    public void execInEnv(ExecEnv env) {
+        env.outputs.add(this.printable());
+    }
 }
 
 class AssignFieldAction extends Action {
@@ -14,6 +17,10 @@ class AssignFieldAction extends Action {
     }
     public String printable() {
         return "packet."+field.name()+" := "+value;
+    }
+    public void execInEnv(ExecEnv env) {
+        super.execInEnv(env);
+        env.packet.put(field, value);
     }
 }
 
@@ -27,6 +34,10 @@ class AssignVariableAction extends Action {
     public String printable() {
         return variable+" := "+value;
     }
+    public void execInEnv(ExecEnv env) {
+        super.execInEnv(env);
+        env.variables.put(variable, value);
+    }
 }
 
 class CopyVariableAction extends Action {
@@ -39,6 +50,10 @@ class CopyVariableAction extends Action {
     public String printable() {
         return variable+" := "+value.printable();
     }
+    public void execInEnv(ExecEnv env) {
+        super.execInEnv(env);
+        env.variables.put(variable, env.matchableValue(value));
+    }
 }
 
 class AssignVariableToFieldAction extends Action {
@@ -50,6 +65,10 @@ class AssignVariableToFieldAction extends Action {
     }
     public String printable() {
         return "packet."+field.name()+" := "+value.printable();
+    }
+    public void execInEnv(ExecEnv env) {
+        super.execInEnv(env);
+        env.packet.put(field, env.matchableValue(value));
     }
 }
 
