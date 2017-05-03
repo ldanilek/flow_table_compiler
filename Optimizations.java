@@ -71,12 +71,12 @@ public class Optimizations implements PlugInOptimization {
             optimized = true;
             OptFlowTable parent = ofts.flowTables.get(parentInd);
             for (Row r : parent.rows) {
-                if (r.jumpIndex.equals(childInd)) {
+                if (r.jumpIndex != null && r.jumpIndex.equals(childInd)) {
                     r.actions.addAll(childActions);
                     r.jumpIndex = null;
                 }
             }
-            parent.children.remove(childInd);
+            parent.children.remove(new Integer(childInd));
         }
         if (optimized) {
             ofts.flowTables.remove(childInd);

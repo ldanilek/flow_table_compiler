@@ -67,7 +67,7 @@ public class Main {
 
         HashMap<PacketField, Integer> packet = new HashMap();
         packet.put(PacketField.InPort, 80);
-        /*
+        
         Statement tree =
             new IF(
                 new Compare(new PacketValue(PacketField.InPort),
@@ -78,11 +78,11 @@ public class Main {
         System.out.println("\nSIMPLE TREE TEST:");
         Statement simpleTree = new Drop();
         runTreeOnPacket(simpleTree, packet, optimizations);
-        */
+        
         System.out.println("\nSIMPLE SEQUENCE TEST:");
         Statement simpleSequence = new Sequence(new DecrementTTL(), new Forward());
         runTreeOnPacket(simpleSequence, packet, optimizations);
-        /*
+        
         System.out.println("\nHASH LOOKUP TEST:");
         HashMap<Integer, Integer> hashMap = new HashMap();
         hashMap.put(80, 90);
@@ -115,6 +115,5 @@ public class Main {
         };
         FlowTable table = new FlowTable(header, new ArrayList<Row>(Arrays.asList(rows)));
         System.out.println(table.printable());
-        */
     }
 }
