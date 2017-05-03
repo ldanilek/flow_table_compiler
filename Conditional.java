@@ -40,16 +40,10 @@ class Compare extends Conditional {
       Cell caseFalse;
 
       switch (op) {
-        case LE:
-          right = right+1;
         case LT:
-          //implement less than
-          break;
-        case GE:
-          right = right-2;
         case GT:
-          //implement greater than
-          break;
+        case LE:
+        case GE:
         case NEQ:
           caseTrue = new Cell(right, ~0, resolveExp.field);
           caseFalse = new Cell(0, 0, resolveExp.field);
