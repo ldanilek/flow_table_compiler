@@ -10,7 +10,7 @@ import java.util.ArrayList;
 class Header {
     public ArrayList<MatchableField> fields;
 
-    public Header(ArrayList<MatchableField> fields){
+    public Header(ArrayList<MatchableField> fields) {
         this.fields = fields;
     }
 
@@ -111,7 +111,7 @@ class FlowTable {
         this.header = header;
         this.rows = rows;
     }
-    
+
     public FlowTable(Header header, ArrayList<Row> rows, int index) {
         this.index = index;
         this.header = header;

@@ -3,23 +3,12 @@ import java.util.*;
 // evaluates to a boolean
 abstract class Conditional {
 
-  public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+  public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
     return null;
   }
 
 }
 
-class ConditionalResult {
-    // to compute the thing
-    public ArrayList<FlowTable> tables;
-    // where is the thing now?
-    public MatchableField field;
-    public ConditionalResult(ArrayList<FlowTable> tables, MatchableField field) {
-        this.tables = tables;
-        this.field = field;
-    }
-}
-/*
 enum CompareOperation {
     LT, GT, LE, GE, EQ, NEQ
 }
@@ -42,20 +31,23 @@ class Compare extends Conditional {
     }
 
     @Override
-    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+    public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
       FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
       ExpressionResult resolveExp = left.asFlowTables(table.index);
-
+      table.header.fields.add(resolveExp.field);
 
       switch (op) {
-        case LT: return (value > right);
-        case GT: return (value > right);
-        case LE: return (value <= right);
-        case GE: return (value >= right);
+        case LT:
+        case GT:
+        case LE:
+        case GE:
+        case NEQ:
         case EQ:
-
-        case NEQ: return (value != right);
+          Cell caseTrue = new Cell(right, ~0, resolveExp.field);
+          Cell caseFalse = new Cell(right, 0, resolveExp.field);
+          table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(caseTrue), thenJumpIndex));
+          table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(caseFalse), elseJumpIndex));
       }
 
       resolveExp.tables.add(table);
@@ -74,16 +66,20 @@ class Contains extends Conditional {
     }
 
     @Override
-    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+    public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
-      public MatchableField valueField = value.asFlowTables(null).field;
+      FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
+      ExpressionResult resolveExp = value.asFlowTables(table.index);
 
-      for (final int i : set) {
-          if (i == valueField) {
-              return true;
-          }
-      }
-      return false;
+      // for (final int i : set) {
+      //     if (i == valueField) {
+      //         return true;
+      //     }
+      // }
+      // return false;
+
+      resolveExp.tables.add(table);
+      return resolveExp.tables;
 
     }
 
@@ -101,15 +97,9 @@ class Logic extends Conditional {
     }
 
     @Override
-    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
-      public Boolean valueLeft = left.result();
-      public Boolean valueRight = right.result();
+    public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
-      switch (op) {
-        case AND: return (valueLeft & valueRight);
-        case OR: return (valueLeft | valueRight);
-        case XOR: return (valueLeft ^ valueRight);
-      }
+      return left.asFlowTables(thenJumpIndex, elseJumpIndex);
     }
 
 }
@@ -121,7 +111,7 @@ class Not extends Conditional {
     }
 
     @Override
-    public ConditionalResult asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
+    public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
       return cond.asFlowTables(elseJumpIndex,thenJumpIndex);
     }
-}*/
+}

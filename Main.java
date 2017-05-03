@@ -71,7 +71,7 @@ public class Main {
         Statement tree =
             new IF(
                 new Compare(new PacketValue(PacketField.InPort),
-                    CompareOperation.LT, 80),
+                    CompareOperation.EQ, 80),
                 new Drop(),
                 new Sequence(new DecrementTTL(), new Forward()));
 
