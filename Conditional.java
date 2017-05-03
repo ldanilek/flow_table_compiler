@@ -24,9 +24,9 @@ class Compare extends Conditional {
     // second operand must be compile-time constant
     public int right;
 
-    public Compare(Expression left, CompareOperation op, int right) {
-        this.left = left;
+    public Compare(CompareOperation op, Expression left, int right) {
         this.op = op;
+        this.left = left;
         this.right = right;
     }
 
@@ -36,6 +36,8 @@ class Compare extends Conditional {
       FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
       ExpressionResult resolveExp = left.asFlowTables(table.index);
       table.header.fields.add(resolveExp.field);
+      Cell caseTrue;
+      Cell caseFalse;
 
       switch (op) {
         case LT:
@@ -43,11 +45,17 @@ class Compare extends Conditional {
         case LE:
         case GE:
         case NEQ:
+          caseTrue = new Cell(right, ~0, resolveExp.field);
+          caseFalse = new Cell(0, 0, resolveExp.field);
+          table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(caseTrue), elseJumpIndex));
+          table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(caseFalse), thenJumpIndex));
+          break;
         case EQ:
-          Cell caseTrue = new Cell(right, ~0, resolveExp.field);
-          Cell caseFalse = new Cell(right, 0, resolveExp.field);
+          caseTrue = new Cell(right, ~0, resolveExp.field);
+          caseFalse = new Cell(0, 0, resolveExp.field);
           table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(caseTrue), thenJumpIndex));
           table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(caseFalse), elseJumpIndex));
+          break;
       }
 
       resolveExp.tables.add(table);
@@ -70,13 +78,13 @@ class Contains extends Conditional {
 
       FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
       ExpressionResult resolveExp = value.asFlowTables(table.index);
+      table.header.fields.add(resolveExp.field);
 
-      // for (final int i : set) {
-      //     if (i == valueField) {
-      //         return true;
-      //     }
-      // }
-      // return false;
+      for (final int i : set) {
+        table.rows.add(new Row(2, new ArrayList(), Util.listWithObject(new Cell(i, ~0, resolveExp.field)), thenJumpIndex));
+      }
+
+      table.rows.add(new Row(1, new ArrayList(), Util.listWithObject(new Cell(0, 0, resolveExp.field)), elseJumpIndex));
 
       resolveExp.tables.add(table);
       return resolveExp.tables;
@@ -99,9 +107,30 @@ class Logic extends Conditional {
     @Override
     public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
-      return left.asFlowTables(thenJumpIndex, elseJumpIndex);
-    }
+      ArrayList<FlowTable> t1Branch = right.asFlowTables(thenJumpIndex, elseJumpIndex);
+      int table1idx = t1Branch.get(0).index;
 
+      switch (op) {
+        case AND:
+          ArrayList<FlowTable> table1 = left.asFlowTables(table1idx, elseJumpIndex);
+          table1.addAll(t1Branch);
+          return table1;
+        case OR:
+          ArrayList<FlowTable> t1FalseBranch = right.asFlowTables(thenJumpIndex, elseJumpIndex);
+          table1 = left.asFlowTables(thenJumpIndex, table1idx);
+          table1.addAll(t1Branch);
+          return table1;
+        case XOR:
+          ArrayList<FlowTable> t1NotBranch = right.asFlowTables(elseJumpIndex, thenJumpIndex);
+          int table1Notidx = t1NotBranch.get(0).index;
+          table1 = left.asFlowTables(table1Notidx, table1idx);
+          table1.addAll(t1Branch);
+          table1.addAll(t1NotBranch);
+          return table1;
+      }
+
+      return null;
+    }
 }
 
 class Not extends Conditional {

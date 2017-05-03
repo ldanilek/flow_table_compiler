@@ -31,9 +31,9 @@ class Cell{
     public MatchableField field;
 
     public Cell (int bitVector, int mask, MatchableField field){
-        this.field = field;
         this.bitVector = bitVector;
         this.mask = mask;
+        this.field = field;
     }
 
     public boolean matchesEnv(ExecEnv env) {

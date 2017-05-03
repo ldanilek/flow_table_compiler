@@ -66,13 +66,18 @@ public class Main {
         ArrayList<PlugInOptimization> optimizations = plugInOptimizations(args);
 
         HashMap<PacketField, Integer> packet = new HashMap();
-        packet.put(PacketField.InPort, 80);
-        
+        packet.put(PacketField.InPort, 81);
+
         System.out.println("\nIF TEST:");
         Statement tree =
             new IF(
-                new Compare(new PacketValue(PacketField.InPort),
-                    CompareOperation.EQ, 80),
+                new Logic(LogicOperation.AND,
+                          new Compare(CompareOperation.EQ,
+                                      new PacketValue(PacketField.InPort),
+                                                      80),
+                          new Compare(CompareOperation.NEQ,
+                                      new PacketValue(PacketField.InPort),
+                                                      80)),
                 new Drop(),
                 new Sequence(new DecrementTTL(), new Forward()));
         runTreeOnPacket(tree, packet, optimizations);
@@ -80,11 +85,11 @@ public class Main {
         System.out.println("\nSIMPLE TREE TEST:");
         Statement simpleTree = new Drop();
         runTreeOnPacket(simpleTree, packet, optimizations);
-        
+
         System.out.println("\nSIMPLE SEQUENCE TEST:");
         Statement simpleSequence = new Sequence(new DecrementTTL(), new Forward());
         runTreeOnPacket(simpleSequence, packet, optimizations);
-        
+
         System.out.println("\nHASH LOOKUP TEST:");
         HashMap<Integer, Integer> hashMap = new HashMap();
         hashMap.put(80, 90);
