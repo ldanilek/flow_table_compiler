@@ -45,9 +45,12 @@ class IF extends Statement {
     public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
       ArrayList<FlowTable> thenTables = thenBranch.asFlowTables(jumpIndex);
       ArrayList<FlowTable> elseTables = elseBranch.asFlowTables(jumpIndex);
-      FlowTable thenTable = thenTables.get(0);
-      FlowTable elseTable = elseTables.get(0);
-      return condition.asFlowTables(thenTable, elseTable);
+      int thenTable = thenTables.get(0).index;
+      int elseTable = elseTables.get(0).index;
+      ArrayList<FlowTable> condTables = condition.asFlowTables(thenTable, elseTable);
+      condTables.addAll(thenTables);
+      condTables.addAll(elseTables);
+      return condTables;
     }
 }
 
