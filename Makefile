@@ -1,5 +1,5 @@
 run: all
-	java Main Optimizations
+	java Main Optimizations DeadVariableElimination
 
 all:
 	javac *.java

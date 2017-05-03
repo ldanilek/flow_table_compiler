@@ -96,12 +96,21 @@ public class Main {
         hashMap.put(90, 100);
         hashMap.put(1024, 0);
         hashMap.put(2, 124);
-        Statement hashLookup = new Assign("hashResult", new LookUp(hashMap, new PacketValue(PacketField.InPort)));
+        Statement hashLookup = new AssignField(PacketField.OutPort, new LookUp(hashMap, new PacketValue(PacketField.InPort)));
         runTreeOnPacket(hashLookup, packet, optimizations);
 
         System.out.println("\nSWITCH LOOKUP TEST:");
-        Statement switchLookup = new Assign("hashResult", new LookUp(hashMap, new Switch()));
+        Statement switchLookup = new AssignField(PacketField.OutPort, new LookUp(hashMap, new Switch()));
         runTreeOnPacket(switchLookup, packet, optimizations);
+
+        System.out.println("\nDEAD VAR REMOVAL TEST:");
+        Statement ded = new Sequence(new Assign("x", new Constant(80)), new AssignField(PacketField.InPort, new Variable("x")));
+        runTreeOnPacket(ded, packet, optimizations);
+
+        System.out.println("\nLIVE VAR TEST:");
+        Statement liv = new Sequence(new Sequence(new Assign("x", new Constant(80)), new AssignField(PacketField.InPort, new Variable("x"))),
+                            new IF(new Compare(CompareOperation.EQ, new Variable("x"), 80), new Drop(), new Forward()));
+        runTreeOnPacket(liv, packet, optimizations);
 
         System.out.println("\nFLOW TABLE PRINTING TEST:");
         MatchableField[] matchableFields = {
