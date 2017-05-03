@@ -103,6 +103,21 @@ public class Main {
         Statement switchLookup = new AssignField(PacketField.OutPort, new LookUp(hashMap, new Switch()));
         runTreeOnPacket(switchLookup, packet, optimizations);
 
+        System.out.println("\nASSIGN SEQUENCE TEST:");
+        Statement assignTree = 
+            new Sequence(
+                new IF(
+                    new Compare(CompareOperation.EQ,
+                        new PacketValue(PacketField.InPort), 80),
+                    new Assign("c", new Constant(2)),
+                    new Assign("c", new Constant(3))),
+                new IF(
+                    new Compare(CompareOperation.EQ, new Variable("c"), 3),
+                    new Forward(),
+                    new Drop()));
+        //runTreeOnPacket(assignTree, packet, new ArrayList<PlugInOptimization> ());
+        runTreeOnPacket(assignTree, packet, optimizations);
+
         System.out.println("\nDEAD VAR REMOVAL TEST:");
         Statement ded = new Sequence(new Assign("x", new Constant(80)), new AssignField(PacketField.InPort, new Variable("x")));
         runTreeOnPacket(ded, packet, optimizations);
