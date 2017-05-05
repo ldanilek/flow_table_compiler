@@ -102,7 +102,7 @@ class VerifyChecksum extends Statement {
     }
 }
 
-class RecomputeCheckSum extends Statement {
+class RecomputeChecksum extends Statement {
     @Override
     public ArrayList<FlowTable> asFlowTables(Integer jumpIndex) {
         return Statement.flowTablesForAction(new RecomputeChecksumAction(), jumpIndex);

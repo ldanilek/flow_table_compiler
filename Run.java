@@ -8,11 +8,16 @@ public class Run {
             System.out.println(table.printable());
         }
     }
+    
+    public static void printTree(Statement s, ArrayList<PlugInOptimization> opts) {
+        ArrayList<FlowTable> tables = s.asFlowTables(null);
+        tables = optimize(tables, opts);
+        printTables(tables);
+    }
 
     public static void runTreeOnPacket(Statement s, HashMap<PacketField, Integer> packet, ArrayList<PlugInOptimization> opts) {
         ArrayList<FlowTable> tables = s.asFlowTables(null);
         tables = optimize(tables, opts);
-        printTables(tables);
         FlowTable entryPoint = tables.get(0);
         ExecEnv env = new ExecEnv(packet);
         entryPoint.execInEnv(env, tables);

@@ -7,6 +7,8 @@ public class Main {
         FlowTable.switchIndex = Input.getSwitch();
         Statement tree = Input.getParseTree();
 
-        Run.runTreeOnPacket(tree, Stubs.packet, optimizations);
+        while(true)
+            Run.runTreeOnPacket(tree, Input.getPacket(), optimizations);
+
     }
 }
