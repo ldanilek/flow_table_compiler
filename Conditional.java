@@ -35,6 +35,8 @@ class Compare extends Conditional {
     @Override
     public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
+      // optimizes conditionals; this will reduce worst-case scenario to
+      // 16 rows per flowtable as opposed to 32 rows
       if ((op == CompareOperation.GT || op == CompareOperation.GE) && right < 32767) {
         int save = elseJumpIndex;
         elseJumpIndex = thenJumpIndex;
