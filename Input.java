@@ -36,19 +36,19 @@ public class Input {
         System.err.println("ERROR: Program should not reach here!");
         return null;
     }
-    
+
     public static ArrayList<PlugInOptimization> getOptimizations(String[] names){
         ArrayList<PlugInOptimization> optimizations = new ArrayList();
-        
+
         for (String name : names) {
             System.out.println("Loading Optimizer '"+name+"'");
-            
+
             // use reflection to load the optimizer
             try {
                 Class optClass = Class.forName(name);
                 Constructor optConstructor = optClass.getConstructor();
                 Object opt = optConstructor.newInstance();
-                
+
                 // check that optimizer responds to the method
                 if (opt instanceof PlugInOptimization) {
                     optimizations.add((PlugInOptimization)opt);
@@ -108,7 +108,7 @@ public class Input {
 
         while(toLoad < 0 || toLoad > trees.length){
             System.out.println("Select a parse tree to run");
-            
+
             for(int i = 0; i < trees.length; i++){
                 System.out.println("\t"+i+": "+descriptions[i]);
             }
@@ -142,7 +142,7 @@ public class Input {
             return false;
         }
     }
-    
+
     private static boolean validateIp(String ipstring){
         // Parse IP parts into an int array
         int[] ip = new int[4];
@@ -174,6 +174,7 @@ public class Input {
 
         String input = null;
         Scanner scanner = new Scanner(System.in);
+        Boolean valCheck = false;
 
         HashMap<PacketField, Integer> toReturn = new HashMap<PacketField, Integer>();
 
@@ -181,7 +182,10 @@ public class Input {
             System.out.print(prompt);
             input = scanner.next();
 
-            if(input.equals(".")) break;
+            if(input.equals(".")) {
+              if (valCheck == true) break;
+              else System.out.println("Packet must have 1 or more values.");
+            }
 
             String [] tokens = input.split("=");
 
@@ -209,6 +213,7 @@ public class Input {
                         continue;
                     }
                     toReturn.put(PacketField.valueOf(tokens[0]), Integer.parseInt(tokens[1]));
+                    valCheck = true;
                     break;
                 default:
                     System.out.println("Invalid field val: <"+tokens[0]+">");
