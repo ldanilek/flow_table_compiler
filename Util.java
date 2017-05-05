@@ -9,8 +9,6 @@ public class Util{
 
     static List<Integer> genMasks(int key, int flag) {
         char[] initVector = intToBinaryString(key).toCharArray();
-        System.out.println(initVector);
-        System.out.println(initVector.length);
         List<Integer> maskArray = new ArrayList<Integer>();
         char check = '0';
         char change = '1';
