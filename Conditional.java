@@ -35,6 +35,29 @@ class Compare extends Conditional {
     @Override
     public ArrayList<FlowTable> asFlowTables(Integer thenJumpIndex, Integer elseJumpIndex) {
 
+      if ((op == CompareOperation.GT || op == CompareOperation.GE) && right < 32767) {
+        int save = elseJumpIndex;
+        elseJumpIndex = thenJumpIndex;
+        thenJumpIndex = save;
+        if (op == CompareOperation.GT) {
+          op = CompareOperation.LE;
+        }
+        else {
+          op = CompareOperation.LT;
+        }
+      }
+      else if ((op == CompareOperation.LT || op == CompareOperation.LE) && right > 32767) {
+        int save = elseJumpIndex;
+        elseJumpIndex = thenJumpIndex;
+        thenJumpIndex = save;
+        if (op == CompareOperation.LT) {
+          op = CompareOperation.GE;
+        }
+        else {
+          op = CompareOperation.GT;
+        }
+      }
+
       FlowTable table = new FlowTable(new Header(new ArrayList<MatchableField>()), new ArrayList<Row>());
       ExpressionResult resolveExp = left.asFlowTables(table.index);
       table.header.fields.add(resolveExp.field);
