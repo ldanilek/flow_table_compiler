@@ -62,7 +62,7 @@ public class Input {
         return optimizations;
     }
 
-    private static int ipAdrToInt(String ipstring){
+    public static int ipAdrToInt(String ipstring){
         // Parse IP parts into an int array
         int[] ip = new int[4];
         String[] parts = ipstring.split("\\.");
